@@ -2,6 +2,7 @@ from urllib.parse import urlparse
 import urllib.request as req
 from pathlib import Path
 import bs4
+import os
 
 # URL = "https://www.john-scrivo.de/lessons.htm"
 # FILE_EXTENSION = "pdf"
@@ -51,7 +52,7 @@ def save_files_to(files_url: list[str], domain: str, path: str) -> None:
     for href in files_url:
         filename = href.split("/")[-1]
         file_url = f"{domain}{href[1:]}" if href.startswith("/") else f"{domain}{href}"
-        full_file_path = f"{path}\\{filename}"
+        full_file_path = f"{path}{os.sep}{filename}"
         print(file_url)
         print(full_file_path)
         req.urlretrieve(file_url, full_file_path)
