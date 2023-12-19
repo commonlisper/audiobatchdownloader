@@ -25,7 +25,7 @@ def request_user_data() -> tuple:
         path.mkdir()
     path_to_save = str(path.absolute())
 
-    return (url, file_extension, path_to_save)
+    return url, file_extension, path_to_save
 
 
 def get_domain_from_url(url: str) -> str:
@@ -33,7 +33,7 @@ def get_domain_from_url(url: str) -> str:
     return f"{url_parsed.scheme}://{url_parsed.netloc}/"
 
 
-def get_html_from(url: str) -> str:
+def get_html(url: str) -> str:
     with req.urlopen(url) as res:
         html = res.read()
 
@@ -61,7 +61,7 @@ def save_files_to(files_url: list[str], domain: str, path: str) -> None:
 
 def main() -> None:
     url, file_extension, path_to_save = request_user_data()
-    html = get_html_from(url)
+    html = get_html(url)
     file_urls = get_file_urls_from(html, file_extension)
     domain = get_domain_from_url(url)
     save_files_to(file_urls, domain, path_to_save)
