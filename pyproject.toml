@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "audiobatchdownloader"
 version = "0.1.0"
-description = ""
+description = "Helps with ease domnload many files from any url resourse"
 authors = ["Active Profi <atosdo@live.com>"]
 readme = "README.md"
 
