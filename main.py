@@ -1,16 +1,21 @@
-from urllib.parse import urlparse
+import os
 import urllib.request as req
 from pathlib import Path
+from urllib.parse import urlparse
+
 import bs4
-import os
+import requests
+from concurrent.futures import ThreadPoolExecutor
 
 
-# URL = "https://www.john-scrivo.de/lessons.htm"
-# FILE_EXTENSION = "pdf"
-# PATH_TO_SAVE = "C:\Users\active\Downloads"
-
-
-def request_user_data() -> tuple:
+def request_user_data() -> tuple[str, str, str]:
+    """
+    Request user data such as
+    url,
+    file extension,
+    path to save
+    from input stream and return tuple with these values.
+    """
     print("Hello ans welcome to AudioBatchDownloader!")
     print("Please, input some data.")
 
@@ -21,27 +26,46 @@ def request_user_data() -> tuple:
     )
 
     path_to_save = input("Enter absolute path on your computer to save files: ")
-    path = Path(path_to_save)
-    if not path.exists():
-        path.mkdir()
-    path_to_save = str(path.absolute())
+    path_to_save = check_file_path(path_to_save)
 
     return url, file_extension, path_to_save
 
 
+def check_file_path(path_to_save) -> str:
+    """
+    Checks if the path exists and creates it if not.
+    Return absolute path where to save the file
+    """
+    path = Path(path_to_save)
+    if not path.exists():
+        path.mkdir()
+
+    path_to_save = str(path.absolute())
+    return path_to_save
+
+
 def get_domain_from_url(url: str) -> str:
+    """
+    Return domain which consist from scheme and domain name.
+    """
     url_parsed = urlparse(url)
     return f"{url_parsed.scheme}://{url_parsed.netloc}/"
 
 
 def get_html(url: str) -> str:
+    """
+    Return html code from specified url.
+    """
     with req.urlopen(url) as res:
         html = res.read()
 
     return html
 
 
-def get_file_urls_from(html: str, extension: str) -> list[str]:
+def get_file_urls(html: str, extension: str) -> list[str]:
+    """
+    Return list of files href from html code with specified extension.
+    """
     soup = bs4.BeautifulSoup(html, "html.parser")
     a_tags = soup.find_all("a")
     hrefs = [tag["href"] for tag in a_tags if tag["href"].endswith(extension)]
@@ -49,26 +73,46 @@ def get_file_urls_from(html: str, extension: str) -> list[str]:
     return hrefs
 
 
-def download_and_save_files(files_url: list[str], domain: str, path: str) -> None:
-    for href in files_url:
-        full_file_path, full_file_url = get_full_file_url(domain, href, path)
-        req.urlretrieve(full_file_url, full_file_path)
-        print(f"file at url = {full_file_url} saved to {full_file_path}")
-
-
-def get_full_file_url(domain, href, path):
+def get_full_file_url(domain: str, href: str, path: str) -> tuple[str, str]:
+    """
+    Return formed full file url.
+    """
     filename = href.split("/")[-1]
     full_file_url = f"{domain}{href[1:]}" if href.startswith("/") else f"{domain}{href}"
     full_file_path = f"{path}{os.sep}{filename}"
-    return full_file_path, full_file_url
+
+    return full_file_url, full_file_path
+
+
+def download_file(file: tuple[str, str]) -> None:
+    """
+    Download one file from url in first param
+    and save it to file path in second param.
+    """
+    url, save_file_path = file
+    response = requests.get(url)
+    with open(save_file_path, mode="wb") as file:
+        file.write(response.content)
+
+    print(f"file at url = {url} saved to {save_file_path}")
+
+
+def download_files(files_url: list[str], domain: str, path: str) -> None:
+    """
+    Download all files to the disk with ThreadPoolExecutor.
+    """
+    files = [get_full_file_url(domain, href, path) for href in files_url]
+
+    with ThreadPoolExecutor() as executor:
+        executor.map(download_file, files)
 
 
 def main() -> None:
     url, file_extension, path_to_save = request_user_data()
     html = get_html(url)
-    file_urls = get_file_urls_from(html, file_extension)
+    file_urls = get_file_urls(html, file_extension)
     domain = get_domain_from_url(url)
-    download_and_save_files(file_urls, domain, path_to_save)
+    download_files(file_urls, domain, path_to_save)
 
 
 if __name__ == "__main__":
