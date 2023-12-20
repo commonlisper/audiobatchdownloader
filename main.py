@@ -4,6 +4,7 @@ from pathlib import Path
 import bs4
 import os
 
+
 # URL = "https://www.john-scrivo.de/lessons.htm"
 # FILE_EXTENSION = "pdf"
 # PATH_TO_SAVE = "C:\Users\active\Downloads"
@@ -48,13 +49,18 @@ def get_file_urls_from(html: str, extension: str) -> list[str]:
     return hrefs
 
 
-def save_files_to(files_url: list[str], domain: str, path: str) -> None:
+def download_and_save_files(files_url: list[str], domain: str, path: str) -> None:
     for href in files_url:
-        filename = href.split("/")[-1]
-        file_url = f"{domain}{href[1:]}" if href.startswith("/") else f"{domain}{href}"
-        full_file_path = f"{path}{os.sep}{filename}"
-        req.urlretrieve(file_url, full_file_path)
-        print(f"file at url = {file_url} saved to {full_file_path}")
+        full_file_path, full_file_url = get_full_file_url(domain, href, path)
+        req.urlretrieve(full_file_url, full_file_path)
+        print(f"file at url = {full_file_url} saved to {full_file_path}")
+
+
+def get_full_file_url(domain, href, path):
+    filename = href.split("/")[-1]
+    full_file_url = f"{domain}{href[1:]}" if href.startswith("/") else f"{domain}{href}"
+    full_file_path = f"{path}{os.sep}{filename}"
+    return full_file_path, full_file_url
 
 
 def main() -> None:
@@ -62,7 +68,7 @@ def main() -> None:
     html = get_html(url)
     file_urls = get_file_urls_from(html, file_extension)
     domain = get_domain_from_url(url)
-    save_files_to(file_urls, domain, path_to_save)
+    download_and_save_files(file_urls, domain, path_to_save)
 
 
 if __name__ == "__main__":
