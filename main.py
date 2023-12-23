@@ -8,7 +8,7 @@ import requests
 from concurrent.futures import ThreadPoolExecutor
 
 
-def request_user_data() -> tuple[str, str, str]:
+def request_user_data() -> list[tuple[str, str, str]]:
     """
     Request user data such as
     url,
@@ -19,16 +19,26 @@ def request_user_data() -> tuple[str, str, str]:
     print("Hello ans welcome to AudioBatchDownloader!")
     print("Please, input some data.")
 
-    url = input("Enter url from witch you want to download files: ")
+    inputs: list[tuple[str, str, str]] = []
+    while True:
+        # TODO: add user input validation in future.
 
-    file_extension = input(
-        "Enter what type of file you want to download from(mp3, pdf, midi): "
-    )
+        url = input("Enter url from witch you want to download files: ")
 
-    path_to_save = input("Enter absolute path on your computer to save files: ")
-    path_to_save = check_file_path(path_to_save)
+        file_extension = input(
+            "Enter what type of file you want to download from(mp3, pdf, midi): "
+        )
 
-    return url, file_extension, path_to_save
+        path_to_save = input("Enter absolute path on your computer to save files: ")
+        path_to_save = check_file_path(path_to_save)
+
+        input_info = (url, file_extension, path_to_save)
+        inputs.append(input_info)
+
+        if input("Do you want to add more? (y/n): ").lower()[0] == "n":
+            break
+
+    return inputs
 
 
 def check_file_path(path_to_save) -> str:
@@ -84,12 +94,12 @@ def get_full_file_url(domain: str, href: str, path: str) -> tuple[str, str]:
     return full_file_url, full_file_path
 
 
-def download_file(file: tuple[str, str]) -> None:
+def download_file(file_info: tuple[str, str]) -> None:
     """
     Download one file from url in first param
     and save it to file path in second param.
     """
-    url, save_file_path = file
+    url, save_file_path = file_info
     response = requests.get(url)
     with open(save_file_path, mode="wb") as file:
         file.write(response.content)
@@ -108,11 +118,16 @@ def download_files(files_url: list[str], domain: str, path: str) -> None:
 
 
 def main() -> None:
-    url, file_extension, path_to_save = request_user_data()
-    html = get_html(url)
-    file_urls = get_file_urls(html, file_extension)
-    domain = get_domain_from_url(url)
-    download_files(file_urls, domain, path_to_save)
+    # TODO: add some coloring to console output with `colorama` lib.
+
+    inputs = request_user_data()
+    for url, file_extension, path_to_save in inputs:
+        print(f"\nProcessing => {url}")
+        html = get_html(url)
+        file_urls = get_file_urls(html, file_extension)
+        domain = get_domain_from_url(url)
+        download_files(file_urls, domain, path_to_save)
+        print("Finished processing.\n")
 
 
 if __name__ == "__main__":
