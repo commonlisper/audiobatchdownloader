@@ -1,11 +1,11 @@
 import os
-import urllib.request as req
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from urllib.parse import urlparse
 
 import bs4
 import requests
-from concurrent.futures import ThreadPoolExecutor
+import colors as c
 
 
 def request_user_data() -> list[tuple[str, str, str]]:
@@ -16,14 +16,17 @@ def request_user_data() -> list[tuple[str, str, str]]:
     path to save
     from input stream and return tuple with these values.
     """
-    print("Hello ans welcome to AudioBatchDownloader!")
-    print("Please, input some data.")
+    print(c.text_green(""".:: Hello ans welcome to AudioBatchDownloader!
+You can download multiple files on the one web page with it!
+Also you can input many urls. ::.
+"""))
+    print(c.text_magenta(".:: Please, input some data. ::."))
 
     inputs: list[tuple[str, str, str]] = []
     while True:
         # TODO: add user input validation in future.
 
-        url = input("Enter url from witch you want to download files: ")
+        url = input(c.text_cyan("Enter url from witch you want to download files: "))
 
         file_extension = input(
             "Enter what type of file you want to download from(mp3, pdf, midi): "
@@ -66,8 +69,8 @@ def get_html(url: str) -> str:
     """
     Return html code from specified url.
     """
-    with req.urlopen(url) as res:
-        html = res.read()
+    response = requests.get(url)
+    html = response.text
 
     return html
 
@@ -119,6 +122,7 @@ def download_files(files_url: list[str], domain: str, path: str) -> None:
 
 def main() -> None:
     # TODO: add some coloring to console output with `colorama` lib.
+    c.init()
 
     inputs = request_user_data()
     for url, file_extension, path_to_save in inputs:
@@ -128,6 +132,8 @@ def main() -> None:
         domain = get_domain_from_url(url)
         download_files(file_urls, domain, path_to_save)
         print("Finished processing.\n")
+
+    c.reset_style()
 
 
 if __name__ == "__main__":
