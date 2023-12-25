@@ -5,6 +5,7 @@ from urllib.parse import urlparse
 
 import bs4
 import requests
+
 import colors as c
 
 
