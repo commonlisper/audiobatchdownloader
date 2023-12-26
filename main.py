@@ -17,10 +17,14 @@ def request_user_data() -> list[tuple[str, str, str]]:
     path to save
     from input stream and return tuple with these values.
     """
-    print(c.text_green(""".:: Hello ans welcome to AudioBatchDownloader!
+    print(
+        c.text_green(
+            """.:: Hello ans welcome to AudioBatchDownloader!
 You can download multiple files on the one web page with it!
 Also you can input many urls. ::.
-"""))
+"""
+        )
+    )
     print(c.text_magenta(".:: Please, input some data. ::."))
 
     inputs: list[tuple[str, str, str]] = []
