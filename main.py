@@ -6,7 +6,9 @@ from urllib.parse import urlparse
 import bs4
 import requests
 
-import colors as c
+from colors import Color
+
+c = Color()
 
 
 def request_user_data() -> list[tuple[str, str, str]]:
@@ -126,10 +128,8 @@ def download_files(files_url: list[str], domain: str, path: str) -> None:
 
 
 def main() -> None:
-    # TODO: add some coloring to console output with `colorama` lib.
-    c.init()
-
     inputs = request_user_data()
+    c.reset_style()
     for url, file_extension, path_to_save in inputs:
         print(f"\nProcessing => {url}")
         html = get_html(url)
@@ -137,8 +137,6 @@ def main() -> None:
         domain = get_domain_from_url(url)
         download_files(file_urls, domain, path_to_save)
         print("Finished processing.\n")
-
-    c.reset_style()
 
 
 if __name__ == "__main__":
