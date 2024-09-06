@@ -1,6 +1,7 @@
 import os
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from urllib import request
 from urllib.parse import urlparse
 
 import bs4
@@ -76,10 +77,14 @@ def get_html(url: str) -> str:
     """
     Return html code from specified url.
     """
-    response = requests.get(url)
-    html = response.text
+    try:
+        response = requests.get(url)
+        html = response.text
 
-    return html
+        return html
+    except requests.RequestException as e:
+        print(f"Error fetching HTML from {url}: {e}")
+        return ""
 
 
 def get_file_urls(html: str, extension: str) -> list[str]:
