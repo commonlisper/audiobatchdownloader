@@ -1,7 +1,6 @@
 import os
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from urllib import request
 from urllib.parse import urlparse
 
 import bs4
