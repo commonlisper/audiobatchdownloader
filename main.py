@@ -1,11 +1,11 @@
 import os
-from concurrent.futures import ThreadPoolExecutor
-from pathlib import Path
-from urllib.parse import urlparse
 
 import bs4
 import requests
 
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+from urllib.parse import urlparse
 from colors import Color
 
 c = Color()
@@ -35,9 +35,7 @@ Also you can input many urls. ::.
 
         url = input(c.text_cyan("Enter url from witch you want to download files: "))
 
-        file_extension = input(
-            "Enter what type of file you want to download from(mp3, pdf, midi): "
-        )
+        file_extension = input("Enter what type of file you want to download from(mp3, pdf, midi): ")
 
         path_to_save = input("Enter absolute path on your computer to save files: ")
         path_to_save = check_file_path(path_to_save)
