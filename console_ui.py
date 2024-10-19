@@ -1,5 +1,5 @@
-from pathlib import Path
 from colors import Color
+from answer import Answer
 
 C = Color()
 
@@ -18,6 +18,7 @@ def show_welcome_message() -> None:
 
 
 def request_user_data() -> list[tuple[str, str, str]]:
+    C.reset_style()
 
     print(C.text_magenta(".:: Please, input some data. ::."))
 
@@ -29,24 +30,17 @@ def request_user_data() -> list[tuple[str, str, str]]:
         file_extension = input("Select the type of file you wish to download (mp3, pdf, midi): ")
         path_to_save = input("Enter the absolute path on your computer to store files: ")
 
-        path_to_save = _check_file_path(path_to_save)
-
         input_info = (url, file_extension, path_to_save)
         inputs.append(input_info)
 
-        if input("Do you want to add more? (y/n): ").lower().startswith("n"):
+        if (
+            input(f"Do you want to add more? ({Answer.YES.value}/{Answer.NO.value}): ")
+            .lower()
+            .startswith(Answer.NO.value)
+        ):
             break
 
     return inputs
-
-
-def _check_file_path(path_to_save: str) -> str:
-    path = Path(path_to_save)
-    if not path.exists():
-        path.mkdir()
-
-    path_to_save = str(path.absolute())
-    return path_to_save
 
 
 def show_process_message(url: str) -> None:

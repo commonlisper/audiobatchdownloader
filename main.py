@@ -1,6 +1,7 @@
 import os
 from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urlparse
+from pathlib import Path
 
 import bs4
 import requests
@@ -54,18 +55,25 @@ def download_file(file_info: tuple[str, str]) -> None:
         print(f"Error downloading file={file_url}: {e}")
 
 
+def resolve_file_path(path_to_save: str) -> str:
+    path = Path(path_to_save)
+    if not path.exists():
+        path.mkdir()
+
+    path_to_save = str(path.absolute())
+    return path_to_save
+
+
 def download_files(files_path: list[str], domain: str, path_to_save: str) -> None:
+    path_to_save = resolve_file_path(path_to_save)
     files = [make_file_url_and_path(domain, path, path_to_save) for path in files_path]
 
     with ThreadPoolExecutor() as executor:
         executor.map(download_file, files)
 
 
-def main() -> None:
-    cui.show_welcome_message()
-    inputs = cui.request_user_data()
-
-    for url, file_extension, path_to_save in inputs:
+def process_data(input_data: list[tuple]) -> None:
+    for url, file_extension, path_to_save in input_data:
         cui.show_process_message(url)
 
         html = get_html(url)
@@ -77,6 +85,12 @@ def main() -> None:
         download_files(file_urls, domain, path_to_save)
 
         cui.show_finish_message()
+
+
+def main() -> None:
+    cui.show_welcome_message()
+    inputs = cui.request_user_data()
+    process_data(inputs)
 
 
 if __name__ == "__main__":
