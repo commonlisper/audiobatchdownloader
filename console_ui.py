@@ -47,3 +47,11 @@ def _check_file_path(path_to_save: str) -> str:
 
     path_to_save = str(path.absolute())
     return path_to_save
+
+
+def show_process_message(url: str) -> None:
+    print(f"\nProcessing => {url}")
+
+
+def show_finish_message() -> None:
+    print("Finished processing.\n")

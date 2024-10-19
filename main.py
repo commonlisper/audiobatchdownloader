@@ -24,33 +24,38 @@ def get_html(url: str) -> str:
         return ""
 
 
-def get_file_urls(html: str, extension: str) -> list[str]:
+def get_files_path(html: str, extension: str) -> list[str]:
     soup = bs4.BeautifulSoup(html, "html.parser")
     a_tags = soup.find_all("a")
-    hrefs = [tag["href"] for tag in a_tags if tag["href"].endswith(extension)]
+    paths = [a["href"] for a in a_tags if a["href"].endswith(extension)]
 
-    return hrefs
+    return paths
 
 
-def get_full_file_url(domain: str, href: str, path: str) -> tuple[str, str]:
-    filename = href.split("/")[-1]
-    full_file_url = f"{domain}{href[1:]}" if href.startswith("/") else f"{domain}{href}"
-    full_file_path = f"{path}{os.sep}{filename}"
+def make_file_url_and_path(domain: str, path: str, path_to_save: str) -> tuple[str, str]:
+    filename = path.split("/")[-1]
+    full_file_url = f"{domain}{path[1:]}" if path.startswith("/") else f"{domain}{path}"
+    full_file_path = f"{path_to_save}{os.sep}{filename}"
 
     return full_file_url, full_file_path
 
 
 def download_file(file_info: tuple[str, str]) -> None:
-    url, save_file_path = file_info
-    response = requests.get(url)
-    with open(save_file_path, mode="wb") as file:
-        file.write(response.content)
+    file_url, path_to_save = file_info
 
-    print(f"file at url = {url} saved to {save_file_path}")
+    try:
+        response = requests.get(file_url)
+
+        with open(path_to_save, mode="wb") as file:
+            file.write(response.content)
+
+        print(f"file at url = {file_url} saved to {path_to_save}")
+    except requests.RequestException as e:
+        print(f"Error downloading file={file_url}: {e}")
 
 
-def download_files(files_url: list[str], domain: str, path: str) -> None:
-    files = [get_full_file_url(domain, href, path) for href in files_url]
+def download_files(files_path: list[str], domain: str, path_to_save: str) -> None:
+    files = [make_file_url_and_path(domain, path, path_to_save) for path in files_path]
 
     with ThreadPoolExecutor() as executor:
         executor.map(download_file, files)
@@ -61,12 +66,17 @@ def main() -> None:
     inputs = cui.request_user_data()
 
     for url, file_extension, path_to_save in inputs:
-        print(f"\nProcessing => {url}")
+        cui.show_process_message(url)
+
         html = get_html(url)
-        file_urls = get_file_urls(html, file_extension)
+        if not html:
+            continue
+
+        file_urls = get_files_path(html, file_extension)
         domain = get_domain_from_url(url)
         download_files(file_urls, domain, path_to_save)
-        print("Finished processing.\n")
+
+        cui.show_finish_message()
 
 
 if __name__ == "__main__":
