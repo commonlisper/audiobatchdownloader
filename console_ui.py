@@ -2,6 +2,7 @@ import validators
 
 from colors import Color
 from answer import Answer
+import extensions
 
 C = Color()
 
@@ -28,10 +29,8 @@ def request_user_data() -> list[tuple[str, str, str]]:
 
     inputs: list[tuple[str, str, str]] = []
     while True:
-        # TODO: add user input validation in future.
-
         url = process_url()
-        file_extension = get_input("Select the type of file you wish to download (mp3, pdf, midi): ")
+        file_extension = process_extension()
         path_to_save = get_input("Enter the absolute path on your computer to store files: ")
 
         input_info = (url, file_extension, path_to_save)
@@ -62,6 +61,25 @@ def validate_url(url: str) -> bool:
         return False
 
     return validation_result
+
+
+def process_extension() -> str:
+    while True:
+        extension = get_input(C.text_cyan("Select the type of file you wish to download (mp3, pdf, midi): "))
+        is_valid_extension = validate_extension(extension)
+
+        if is_valid_extension:
+            return extension
+
+        print(C.text_red("The file extension you entered is not valid, please enter it again"))
+        C.reset_style()
+
+
+def validate_extension(ext: str) -> bool:
+    if ext in extensions.ALL:
+        return True
+
+    return False
 
 
 def show_process_message(url: str) -> None:
