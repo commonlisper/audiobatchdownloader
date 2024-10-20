@@ -1,3 +1,5 @@
+import validators
+
 from colors import Color
 from answer import Answer
 
@@ -17,30 +19,49 @@ def show_welcome_message() -> None:
     )
 
 
-def request_user_data() -> list[tuple[str, str, str]]:
-    C.reset_style()
+def get_input(msg: str) -> str:
+    return input(msg).lower()
 
-    print(C.text_magenta(".:: Please, input some data. ::."))
+
+def request_user_data() -> list[tuple[str, str, str]]:
+    print(C.text_magenta(".:: Please, input some data. ::.\n"))
 
     inputs: list[tuple[str, str, str]] = []
     while True:
         # TODO: add user input validation in future.
 
-        url = input(C.text_cyan("Enter the URL from which you wish to download files: "))
-        file_extension = input("Select the type of file you wish to download (mp3, pdf, midi): ")
-        path_to_save = input("Enter the absolute path on your computer to store files: ")
+        url = process_url()
+        file_extension = get_input("Select the type of file you wish to download (mp3, pdf, midi): ")
+        path_to_save = get_input("Enter the absolute path on your computer to store files: ")
 
         input_info = (url, file_extension, path_to_save)
         inputs.append(input_info)
 
-        if (
-            input(f"Do you want to add more? ({Answer.YES.value}/{Answer.NO.value}): ")
-            .lower()
-            .startswith(Answer.NO.value)
-        ):
+        if get_input(f"Do you want to add more? ({Answer.YES.value}/{Answer.NO.value}): ").startswith(Answer.NO.value):
             break
 
     return inputs
+
+
+def process_url() -> str:
+    while True:
+        url = get_input(C.text_cyan("Enter the URL from which you wish to download files: "))
+        is_valid = validate_url(url)
+
+        if is_valid:
+            return url
+
+        print(C.text_red("The URL you entered is not valid, please enter it again"))
+        C.reset_style()
+
+
+def validate_url(url: str) -> bool:
+    validation_result = validators.url(url)
+
+    if isinstance(validation_result, validators.ValidationError):
+        return False
+
+    return validation_result
 
 
 def show_process_message(url: str) -> None:
@@ -48,4 +69,4 @@ def show_process_message(url: str) -> None:
 
 
 def show_finish_message() -> None:
-    print("Finished processing.\n")
+    print(C.text_magenta("Finished processing.\n"))
