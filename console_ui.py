@@ -31,9 +31,9 @@ def request_user_data() -> list[tuple[str, str, str]]:
     while True:
         url = process_url()
         file_extension = process_extension()
-        path_to_save = get_input("Enter the absolute path on your computer to store files: ")
+        path_to_save = resolve_path(process_path())
 
-        input_info = (url, file_extension, path_to_save)
+        input_info = (url, file_extension, str(path_to_save))
         inputs.append(input_info)
 
         if get_input(f"Do you want to add more? ({Answer.YES.value}/{Answer.NO.value}): ").startswith(Answer.NO.value):
@@ -108,13 +108,25 @@ def process_path() -> str:
     return path
 
 
+# func with `smell`
 def validate_path(path: str) -> bool:
-    p = Path(path)
+    # create path and make absolute
+    p = resolve_path(path)
 
+    # after creation, check that it has been created
     if not p.is_dir():
         return False
 
     return True
+
+
+def resolve_path(path: str) -> Path:
+    p = Path(path)
+
+    if not p.exists():
+        p.mkdir()
+
+    return p.absolute()
 
 
 def show_process_message(url: str) -> None:
