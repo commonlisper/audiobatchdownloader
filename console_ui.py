@@ -135,3 +135,7 @@ def show_process_message(url: str) -> None:
 
 def show_finish_message() -> None:
     print(_C.text_magenta("Finished processing.\n"))
+
+
+def show_no_file_message(extension: str) -> None:
+    print(_C.text_red(f"No files found with the extension .{extension}"))

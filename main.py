@@ -71,6 +71,10 @@ def process_data(input_data: list[tuple]) -> None:
             continue
 
         file_urls = get_files_path(html, file_extension)
+        if not file_urls:
+            cui.show_no_file_message(file_extension)
+            continue
+
         domain = get_domain_from_url(url)
         download_files(file_urls, domain, path_to_save)
 
