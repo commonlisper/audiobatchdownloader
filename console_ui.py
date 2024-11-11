@@ -139,3 +139,15 @@ def show_finish_message() -> None:
 
 def show_no_file_message(extension: str) -> None:
     print(_C.text_red(f"No files found with the extension .{extension}"))
+
+
+def show_downloaded_file_info(file_url: str, path_to_save: str) -> None:
+    print(f"file at url = {file_url} saved to {path_to_save}")
+
+
+def show_error_while_file_download(file_url, e):
+    print(f"Error downloading file={file_url}: {e}")
+
+
+def show_error_while_fetching_html(url, e):
+    print(f"Error fetching HTML from {url}: {e}")

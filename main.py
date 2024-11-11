@@ -20,7 +20,7 @@ def get_html(url: str) -> str:
 
         return html
     except requests.RequestException as e:
-        print(f"Error fetching HTML from {url}: {e}")
+        cui.show_error_while_fetching_html(url, e)
         return ""
 
 
@@ -49,9 +49,9 @@ def download_file(file_info: tuple[str, str]) -> None:
         with open(path_to_save, mode="wb") as file:
             file.write(response.content)
 
-        print(f"file at url = {file_url} saved to {path_to_save}")
+        cui.show_downloaded_file_info(file_url, path_to_save)
     except requests.RequestException as e:
-        print(f"Error downloading file={file_url}: {e}")
+        cui.show_error_while_file_download(file_url, e)
 
 
 def download_files(files_path: list[str], domain: str, path_to_save: str) -> None:
