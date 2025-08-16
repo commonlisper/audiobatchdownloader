@@ -1,5 +1,5 @@
 run:
-	poetry run python main.py
+	uv run python main.py
 
-update:
-	poetry update
+sync:
+	uv sync

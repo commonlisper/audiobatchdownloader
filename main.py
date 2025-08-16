@@ -27,7 +27,12 @@ def get_html(url: str) -> str:
 def get_files_path(html: str, extension: str) -> list[str]:
     soup = bs4.BeautifulSoup(html, "html.parser")
     a_tags = soup.find_all("a")
-    paths = [a["href"] for a in a_tags if a["href"].endswith(extension)]
+
+    paths = []
+    for a in a_tags:
+        href = a.get("href")
+        if href and href.endswith(extension):
+            paths.append(href)
 
     return paths
 
