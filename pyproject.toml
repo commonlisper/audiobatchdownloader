@@ -16,6 +16,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "ruff>=0.12.9",
+    "types-colorama>=0.4.15.20250801",
     "types-requests>=2.32.4.20250809",
 ]
 
