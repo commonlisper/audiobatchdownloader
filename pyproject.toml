@@ -14,7 +14,10 @@ dependencies = [
 
 
 [dependency-groups]
-dev = ["ruff>=0.12.9"]
+dev = [
+    "ruff>=0.12.9",
+    "types-requests>=2.32.4.20250809",
+]
 
 
 [tool.ruff]
