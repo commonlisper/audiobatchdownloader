@@ -92,10 +92,7 @@ def process_extension() -> str:
 
 
 def validate_extension(ext: str) -> bool:
-    if ext in extensions.ALL:
-        return True
-
-    return False
+    return ext in extensions.ALL
 
 
 def process_path() -> str:
@@ -114,10 +111,7 @@ def validate_path(path: str) -> bool:
     p = resolve_path(path)
 
     # after creation, check that it has been created
-    if not p.is_dir():
-        return False
-
-    return True
+    return p.is_dir()
 
 
 def resolve_path(path: str) -> Path:
